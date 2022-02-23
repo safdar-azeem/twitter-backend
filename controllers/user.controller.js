@@ -14,6 +14,18 @@ controller.getUsers = async (req, res) => {
 	}
 };
 
+controller.getUserById = async (req, res) => {
+	try {
+		const user = await User.findById(req.params.id);
+		user.password = undefined;
+		res.status(STATUS.SUCCESS).json(user);
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: "User not found",
+		});
+	}
+};
+
 controller.createUser = async (req, res) => {
 	try {
 		const user = await User.create(req.body);
