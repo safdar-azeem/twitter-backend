@@ -31,14 +31,6 @@ const userSchema = new Schema({
                     throw new Error({
                         message: 'Password must be at least 6 characters long',
                     });
-                } else if (value.length > 20) {
-                    throw new Error({
-                        message: 'Password must be less than 20 characters long',
-                    });
-                } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/.test(value)) {
-                    throw new Error({
-                        message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-                    });
                 }
             },
             } 

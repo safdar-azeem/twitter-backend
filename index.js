@@ -4,10 +4,13 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const connectDb = require('./config/connectDb.config');
+const routes = require('./routes');
 
-
-app.use(bodyParser.json());
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use('/api/v1/', routes);
 
 const startServer = async () => {
     const port = process.env.PORT || 5010;
