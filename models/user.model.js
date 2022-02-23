@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const { hashPassword, comparePassword } = require('../utils/hashPassword');
 
 const userSchema = new Schema({
     name: {
@@ -67,6 +68,26 @@ const userSchema = new Schema({
         default: false
     },
 });
+
+userSchema.pre('save', async function (next) {
+	try {
+		if (this.isModified('password')) {
+			this.password = await hashPassword(this.password);
+		}
+		next();
+	} catch (err) {
+		next(err);
+	}
+});
+
+userSchema.methods.comparePassword = async function (candidatePassword) {
+    try {
+        const isMatch = await comparePassword(candidatePassword, this.password);
+        return isMatch;
+    } catch (err) {
+        throw new Error(err);
+    }
+};
 
 const User = mongoose.model('User', userSchema);
 
