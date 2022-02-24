@@ -10,10 +10,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.get('/', (req, res) => {
+    res.send('Welcome to the API');
+})
+
 app.use('/api/v1/', routes);
 
+
 const startServer = async () => {
-    const port = process.env.PORT || 5010;
+    const port = process.env.PORT || 5050;
     try {
         await connectDb();
         app.listen(port, () => {
