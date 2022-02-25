@@ -6,12 +6,12 @@ const userSchema = new Schema({
     name: {
         type: String,
         trim: true,
-        required: true
+        required: [true, 'Name is required'],
     },
     email: {
         type: String,
-        required: true,
-        unique: true,
+        required: [true, 'Email is required'],
+        unique: [true, 'Email already exist'],
         trim: true,
         validate: {
             validator: function(value) {
@@ -23,7 +23,7 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: [true, 'Password is required'],
         minlength: 6,
         maxlength: 20,
         validate: {
