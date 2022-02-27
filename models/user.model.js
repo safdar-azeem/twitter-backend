@@ -40,7 +40,11 @@ const userSchema = new Schema({
         type: String,
         default: null,
     },
-    date_created: {
+    date_Of_birth: {
+        type: Date,
+        default: null,
+    },
+    date_Created: {
         type: Date,
         default: Date.now
     },
