@@ -40,6 +40,14 @@ const userSchema = new Schema({
         type: String,
         default: null,
     },
+    cover: {
+        type: String,
+        default: null,
+    },
+    bio: {
+        type: String,
+        default: null,
+    },
     date_Of_birth: {
         type: Date,
         default: null,
