@@ -37,7 +37,8 @@ const userSchema = new Schema({
             } 
     },
     avatar: {
-        type: String
+        type: String,
+        default: null,
     },
     date_created: {
         type: Date,
