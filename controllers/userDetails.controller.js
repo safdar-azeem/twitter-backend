@@ -1,25 +1,33 @@
 const controller = {};
 const STATUS = require('../utils/status');
-const User = require('../models/user.model');
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
 
 controller.uploadAvatar = async (req, res) => {
 	try {
-		const user = await User.findById(req.userId);
-		if (!user) {
-			return res.status(STATUS.NOT_FOUND).json({
-				message: 'User not found',
+		const { files } = req;
+		if (!files ||  !files.image) {
+			return res.status(STATUS.BAD_REQUEST).json({
+				status: STATUS.BAD_REQUEST,
+				message: 'Please provide an image',
 			});
 		}
+		const result = await cloudinary.uploader.upload(files.image.tempFilePath, {
+			folder: 'avatars',
+			use_filename: true,
+		});
 
-		if (req.file) {
-			user.avatar = req.file.path;
-		}
+		fs.unlinkSync(files.image.tempFilePath);
 
-		await user.save();
-		res.status(STATUS.SUCCESS).json(user);
+		return res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Avatar uploaded successfully',
+			src: result.secure_url,
+		});
 	} catch (err) {
-		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
-			message: err.message,
+		return res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			status: STATUS.INTERNAL_SERVER_ERROR,
+			message: 'Server error',
 		});
 	}
 };
