@@ -28,7 +28,7 @@ controller.getUserById = async (req, res) => {
 	}
 };
 
-controller.uploadAvatar = async (req, res) => {
+controller.uploadAvatarOrCover = async (req, res) => {
 	try {
 		const { files } = req;
 		if (!files || !files.image) {
@@ -38,7 +38,7 @@ controller.uploadAvatar = async (req, res) => {
 			});
 		}
 		const result = await cloudinary.uploader.upload(files.image.tempFilePath, {
-			folder: 'avatars',
+			folder: 'avatarsAndCover',
 			use_filename: true,
 		});
 
@@ -46,7 +46,7 @@ controller.uploadAvatar = async (req, res) => {
 
 		return res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
-			message: 'Avatar uploaded successfully',
+			message: 'uploaded successfully',
 			src: result.secure_url,
 		});
 	} catch (err) {
