@@ -64,18 +64,14 @@ const userSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    total_Followers: {
-        type: Number,
-        default: 0
-    },
-    total_Following: {
-        type: Number,
-        default: 0
-    },
-    total_Tweets: {
-        type: Number,
-        default: 0
-    },
+    following: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }],
+    followers: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }],
     total_Notifications: {
         type: Number,
         default: 0
