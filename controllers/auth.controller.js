@@ -14,7 +14,12 @@ controller.signup = async (req, res) => {
 		}
 
 		const user = await User.create(req.body);
-		res.status(STATUS.CREATED).json(user);
+		res.status(STATUS.CREATED).json({
+			status: STATUS.CREATED,
+			message: 'User created successfully',
+			user: user,
+
+		});
 	} catch (err) {
 		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
 			message: err.message,

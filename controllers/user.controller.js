@@ -8,7 +8,11 @@ const fs = require('fs');
 controller.getUsers = async (req, res) => {
 	try {
 		const users = await User.find({});
-		res.status(STATUS.SUCCESS).json(users);
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Users found',
+			users,
+		});
 	} catch (err) {
 		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
 			message: err.message,
@@ -20,7 +24,11 @@ controller.getUserById = async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id);
 		user.password = undefined;
-		res.status(STATUS.SUCCESS).json(user);
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'User found',
+			user,
+		});
 	} catch (err) {
 		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
 			message: "User not found",
