@@ -88,6 +88,10 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
+    tweets: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Tweet'
+    }],
 });
 
 userSchema.pre('save', async function (next) {
