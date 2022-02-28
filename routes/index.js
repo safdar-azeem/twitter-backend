@@ -6,6 +6,6 @@ const tweetRoute = require('./tweet.route');
 
 router.use('/auth', authRoute);
 router.use('/user', userRoute);
-router.use('/tweets', tweetRoute);
+router.use('/tweet', tweetRoute);
 
 module.exports = router;

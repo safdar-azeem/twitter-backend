@@ -5,14 +5,13 @@ const Schema = mongoose.Schema;
 const tweetSchema = new Schema({
     content: {
         type: String,
-        required: [true, 'Content is required'],
         trim: true,
     },
     photo: {
         type: String,
         default: null
     },
-    user: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: [true, 'User is required'],
