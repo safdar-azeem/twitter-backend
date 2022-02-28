@@ -40,6 +40,14 @@ const userSchema = new Schema({
         type: String,
         default: null,
     },
+    location: {
+        type: String,
+        default: null,
+    },
+    website:{
+        type: String,
+        default: null,
+    },
     cover: {
         type: String,
         default: null,
