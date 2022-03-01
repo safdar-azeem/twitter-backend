@@ -56,18 +56,45 @@ controller.getTweets = async (req, res) => {
 
 		const allIds = [...user.following, user._id];
 		const tweets = await Tweet.find({
-			user: {
-				$in: allIds,
-			},
 			$or: [
 				{
-					user: user._id,
+					$and: [
+						{
+							$or: [
+								{
+									user: {
+										$in: allIds,
+									},
+								},
+								{
+									retweetedBy: {
+										$in: allIds,
+									},
+								},
+							],
+						},
+						{
+							$or: [
+								{
+									is_Public: true,
+								},
+								{
+									user: req.params.id,
+								},
+							],
+						},
+					],
 				},
 				{
-					is_public: true,
+					user: {
+						$in: req.params.id,
+					},
+					is_Public: true,
 				},
 			],
-		}).populate('user').sort({ createdAt: -1 });
+		})
+			.populate('user')
+			.sort({ createdAt: -1 });
 		res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
 			message: 'Tweets fetched successfully',
@@ -81,41 +108,153 @@ controller.getTweets = async (req, res) => {
 };
 
 controller.getUserTweets = async (req, res) => {
-    try {
-        const tweets = await Tweet.find({
-            user: req.params.id,
-        }).populate('user').sort({ createdAt: -1 });
-        res.status(STATUS.SUCCESS).json({
-            status: STATUS.SUCCESS,
-            message: 'Tweets fetched successfully',
-            tweets,
-        });
-    } catch (err) {
-        res.status(STATUS.INTERNAL_SERVER_ERROR).json({
-            message: err.message,
-        });
-    }
+	try {
+		const tweets = await Tweet.find({
+			$or: [
+				{
+					user: req.params.id,
+				},
+				{
+					$and :[
+						{
+							retweetedBy: req.params.id,
+						},
+						{
+							is_Public: true,
+						}
+					]
+				},
+			],
+		})
+			.populate('user')
+			.sort({ createdAt: -1 });
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Tweets fetched successfully',
+			tweets,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
 };
 
 controller.getUserMediaTweets = async (req, res) => {
-    try {
-        const tweets = await Tweet.find({
-            user: req.params.id,
-            photo: {
-                $ne: null,
-            },
-        }).populate('user').sort({ createdAt: -1 });
-        res.status(STATUS.SUCCESS).json({
-            status: STATUS.SUCCESS,
-            message: 'Tweets fetched successfully',
-            tweets,
-        });
+	try {
+		const tweets = await Tweet.find({
+			$or: [
+				{
+					user: req.params.id,
+				},
+				{
+					$and: [
+						{
+							retweetedBy: req.params.id,
+						},
+						{
+							is_Public: true,
+						},
+					],
+				},
+			],
+			photo: {
+				$ne: null,
+			},
+		})
+			.populate('user')
+			.sort({ createdAt: -1 });
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Tweets fetched successfully',
+			tweets,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
 
-    } catch (err) {
-        res.status(STATUS.INTERNAL_SERVER_ERROR).json({
-            message: err.message,
-        });
-    }
+controller.likeTweet = async (req, res) => {
+	try {
+		const tweet = await Tweet.findById(req.params.id);
+		if (!tweet) {
+			return res.status(STATUS.NOT_FOUND).json({
+				status: STATUS.NOT_FOUND,
+				message: 'Tweet not found',
+			});
+		}
+		const user = await User.findById(req.params.userId);
+		if (!user) {
+			return res.status(STATUS.NOT_FOUND).json({
+				status: STATUS.NOT_FOUND,
+				message: 'User not found',
+			});
+		}
+		if (tweet.likes.includes(user._id)) {
+			tweet.likes = tweet.likes.filter((like) => like.toString() !== user._id.toString());
+			await tweet.save();
+			return res.status(STATUS.SUCCESS).json({
+				status: STATUS.SUCCESS,
+				message: 'Tweet unliked successfully',
+				tweet,
+			});
+		}
+		tweet.likes.push(user._id);
+		await tweet.save();
+		return res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Tweet liked successfully',
+			tweet,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
+
+controller.retweet = async (req, res) => {
+	try {
+		const tweet = await Tweet.findById(req.params.id);
+		if (!tweet) {
+			return res.status(STATUS.NOT_FOUND).json({
+				status: STATUS.NOT_FOUND,
+				message: 'Tweet not found',
+			});
+		}
+		const user = await User.findById(req.params.userId);
+		if (!user) {
+			return res.status(STATUS.NOT_FOUND).json({
+				status: STATUS.NOT_FOUND,
+				message: 'User not found',
+			});
+		}
+
+		if (tweet.retweetedBy.includes(user._id)) {
+			tweet.retweetedBy = tweet.retweetedBy.filter(
+				(retweetedBy) => retweetedBy.toString() !== user._id.toString(),
+			);
+			await tweet.save();
+			return res.status(STATUS.SUCCESS).json({
+				status: STATUS.SUCCESS,
+				message: 'Tweet unretweeted successfully',
+				tweet,
+			});
+		}
+		tweet.retweetedBy.push(user._id);
+		await tweet.save();
+		return res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Tweet retweeted successfully',
+			tweet,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
 };
 
 module.exports = controller;

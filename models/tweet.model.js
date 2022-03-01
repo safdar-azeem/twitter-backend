@@ -36,17 +36,17 @@ const tweetSchema = new Schema({
 			ref: 'Comment',
 		},
 	],
-	retweets: [
+	retweetedBy: [
 		{
 			type: Schema.Types.ObjectId,
-			ref: 'Tweet',
+			ref: 'User',
 		},
 	],
-	is_public: {
+	is_Public: {
 		type: Boolean,
 		default: true,
 	},
-	is_pinned: {
+	is_Pinned: {
 		type: Boolean,
 		default: false,
 	},
