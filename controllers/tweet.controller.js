@@ -59,6 +59,14 @@ controller.getTweets = async (req, res) => {
 			user: {
 				$in: allIds,
 			},
+			$or: [
+				{
+					user: user._id,
+				},
+				{
+					is_public: true,
+				},
+			],
 		}).populate('user').sort({ createdAt: -1 });
 		res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
@@ -70,6 +78,44 @@ controller.getTweets = async (req, res) => {
 			message: err.message,
 		});
 	}
+};
+
+controller.getUserTweets = async (req, res) => {
+    try {
+        const tweets = await Tweet.find({
+            user: req.params.id,
+        }).populate('user').sort({ createdAt: -1 });
+        res.status(STATUS.SUCCESS).json({
+            status: STATUS.SUCCESS,
+            message: 'Tweets fetched successfully',
+            tweets,
+        });
+    } catch (err) {
+        res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+            message: err.message,
+        });
+    }
+};
+
+controller.getUserMediaTweets = async (req, res) => {
+    try {
+        const tweets = await Tweet.find({
+            user: req.params.id,
+            photo: {
+                $ne: null,
+            },
+        }).populate('user').sort({ createdAt: -1 });
+        res.status(STATUS.SUCCESS).json({
+            status: STATUS.SUCCESS,
+            message: 'Tweets fetched successfully',
+            tweets,
+        });
+
+    } catch (err) {
+        res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+            message: err.message,
+        });
+    }
 };
 
 module.exports = controller;
