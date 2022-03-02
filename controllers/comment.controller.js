@@ -6,6 +6,20 @@ const Comment = require('../models/comment.model');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 
+controller.getCommentsByTweetId = async (req, res) => {
+    try {
+        const comments = await Comment.find({ tweet: req.params.id }).populate('user');
+        res.status(STATUS.SUCCESS).json({
+            status: STATUS.SUCCESS,
+            message: 'Comments found',
+            comments,
+        });
+    } catch (err) {
+        res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+            message: err.message,
+        });
+    }
+};
 
 controller.postComment = async (req, res) => {
     try {
