@@ -81,4 +81,42 @@ controller.updateUser = async (req, res) => {
 	}
 };
 
+
+controller.followUser = async (req, res) => {
+	try {
+		const user = await User.findById(req.params.userId);
+		const userToFollow = await User.findById(req.params.followingId);
+		if (!user || !userToFollow) {
+			return res.status(STATUS.NOT_FOUND).json({
+				status: STATUS.NOT_FOUND,
+				message: 'User not found',
+			});
+		}
+		if (user.following.includes(req.params.followingId)) {
+			user.following.pull(req.params.followingId);
+			userToFollow.followers.pull(req.params.userId);
+		} else {
+			user.following.push(req.params.followingId);
+			userToFollow.followers.push(req.params.userId);
+		}
+
+		await user.save({
+			validateBeforeSave: false,
+		});
+		await userToFollow.save({
+			validateBeforeSave: false,
+		});
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'User updated successfully',
+			user,
+			userToFollow,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
+
 module.exports = controller;
