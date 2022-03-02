@@ -217,7 +217,7 @@ controller.likeTweet = async (req, res) => {
 
 controller.retweet = async (req, res) => {
 	try {
-		const tweet = await Tweet.findById(req.params.id);
+		let tweet = await Tweet.findById(req.params.id);
 		if (!tweet) {
 			return res.status(STATUS.NOT_FOUND).json({
 				status: STATUS.NOT_FOUND,
@@ -237,18 +237,22 @@ controller.retweet = async (req, res) => {
 				(retweetedBy) => retweetedBy.toString() !== user._id.toString(),
 			);
 			await tweet.save();
+			tweet = await Tweet.findById(req.params.id).populate('user');
 			return res.status(STATUS.SUCCESS).json({
 				status: STATUS.SUCCESS,
 				message: 'Tweet unretweeted successfully',
 				tweet,
+				isRetweeted: false,
 			});
 		}
 		tweet.retweetedBy.push(user._id);
 		await tweet.save();
+		tweet = await Tweet.findById(req.params.id).populate('user');
 		return res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
 			message: 'Tweet retweeted successfully',
 			tweet,
+			isRetweeted: true
 		});
 	} catch (err) {
 		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
