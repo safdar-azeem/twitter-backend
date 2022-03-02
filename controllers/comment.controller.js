@@ -24,7 +24,7 @@ controller.getCommentsByTweetId = async (req, res) => {
 controller.postComment = async (req, res) => {
     try {
         const { content, tweetId, userId } = req.body;
-        const tweet = await Tweet.findById(tweetId);
+        const tweet = await Tweet.findById(tweetId).populate('user');
         const user = await User.findById(userId);
         if (!tweet || !user) {
             return res.status(STATUS.BAD_REQUEST).json({

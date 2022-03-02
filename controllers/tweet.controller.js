@@ -222,6 +222,7 @@ controller.likeTweet = async (req, res) => {
 		if (tweet.likes.includes(user._id)) {
 			tweet.likes = tweet.likes.filter((like) => like.toString() !== user._id.toString());
 			await tweet.save();
+			tweet.user = await User.findById(tweet.user);
 			return res.status(STATUS.SUCCESS).json({
 				status: STATUS.SUCCESS,
 				message: 'Tweet unliked successfully',
@@ -230,6 +231,7 @@ controller.likeTweet = async (req, res) => {
 		}
 		tweet.likes.push(user._id);
 		await tweet.save();
+		tweet.user = await User.findById(tweet.user);
 		return res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
 			message: 'Tweet liked successfully',
