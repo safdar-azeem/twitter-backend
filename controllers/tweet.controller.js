@@ -115,14 +115,14 @@ controller.getUserTweets = async (req, res) => {
 					user: req.params.id,
 				},
 				{
-					$and :[
+					$and: [
 						{
 							retweetedBy: req.params.id,
 						},
 						{
 							is_Public: true,
-						}
-					]
+						},
+					],
 				},
 			],
 		})
@@ -161,6 +161,33 @@ controller.getUserMediaTweets = async (req, res) => {
 			photo: {
 				$ne: null,
 			},
+		})
+			.populate('user')
+			.sort({ createdAt: -1 });
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Tweets fetched successfully',
+			tweets,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
+
+controller.getTweetsLikeByUser = async (req, res) => {
+	try {
+		const tweets = await Tweet.find({
+			likes: req.params.id,
+			$or: [
+				{
+					user: req.params.id
+				},
+				{
+					is_Public: true,
+				},
+			],
 		})
 			.populate('user')
 			.sort({ createdAt: -1 });
@@ -252,7 +279,7 @@ controller.retweet = async (req, res) => {
 			status: STATUS.SUCCESS,
 			message: 'Tweet retweeted successfully',
 			tweet,
-			isRetweeted: true
+			isRetweeted: true,
 		});
 	} catch (err) {
 		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
