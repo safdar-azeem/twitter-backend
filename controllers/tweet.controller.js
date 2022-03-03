@@ -2,6 +2,7 @@ const controller = {};
 const STATUS = require('../utils/status');
 const User = require('../models/user.model');
 const Tweet = require('../models/tweet.model');
+const Comment = require('../models/comment.model');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 
@@ -195,6 +196,35 @@ controller.getTweetsLikeByUser = async (req, res) => {
 			status: STATUS.SUCCESS,
 			message: 'Tweets fetched successfully',
 			tweets,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
+
+controller.getTweetById = async (req, res) => {
+	try {
+		const tweet = await Tweet.findById(req.params.id)
+			.populate('user')
+
+		if (!tweet) {
+			return res.status(STATUS.NOT_FOUND).json({
+				message: 'Tweet not found',
+			});
+		}
+
+		tweet.comments = await Comment.find({
+			_id: tweet.comments,
+		}).populate('user')
+			
+		
+			
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Tweet fetched successfully',
+			tweet,
 		});
 	} catch (err) {
 		res.status(STATUS.INTERNAL_SERVER_ERROR).json({

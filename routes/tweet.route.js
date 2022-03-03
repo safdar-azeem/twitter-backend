@@ -6,6 +6,7 @@ router.get('/getTweets/:id', controller.getTweets);
 router.get('/getUserTweets/:id', controller.getUserTweets);
 router.get('/getUserMediaTweets/:id', controller.getUserMediaTweets);
 router.get('/getTweetsLikeByUser/:id', controller.getTweetsLikeByUser);
+router.get('/getTweetById/:id', controller.getTweetById);
 router.post('/likeTweet/:id/:userId', controller.likeTweet);
 router.post('/retweet/:id/:userId', controller.retweet);
 router.post('/uploadPhoto', controller.uploadTweetPhoto);
