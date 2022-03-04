@@ -88,6 +88,11 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Tweet'
     }],
+    bookmarks: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Tweet'
+    }],
+
 });
 
 userSchema.pre('save', async function (next) {

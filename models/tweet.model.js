@@ -50,6 +50,13 @@ const tweetSchema = new Schema({
 		type: Boolean,
 		default: false,
 	},
+	bookmarks: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'User',
+		},
+	],
+			
 });
 
 

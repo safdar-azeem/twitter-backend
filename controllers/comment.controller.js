@@ -8,7 +8,9 @@ const fs = require('fs');
 
 controller.getCommentsByTweetId = async (req, res) => {
 	try {
-		const comments = await Comment.find({ tweet: req.params.id }).populate('user');
+		const comments = await Comment.find({ tweet: req.params.id })
+			.populate('user')
+			.sort({ createdAt: -1 });
 		res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
 			message: 'Comments found',
@@ -24,7 +26,7 @@ controller.getCommentsByTweetId = async (req, res) => {
 controller.postComment = async (req, res) => {
 	try {
 		const { content, tweetId, userId } = req.body;
-		const [tweet, user] = await Promise.all([Tweet.findById(tweetId), User.findById(userId)]);
+		const [tweet, user] = await Promise.all([Tweet.findById(tweetId).populate('user'), User.findById(userId)]);
 		if (!tweet || !user) {
 			return res.status(STATUS.BAD_REQUEST).json({
 				status: STATUS.BAD_REQUEST,
