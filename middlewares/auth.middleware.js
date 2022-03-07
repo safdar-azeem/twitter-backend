@@ -4,6 +4,8 @@ const User = require('../models/user.model');
 
 const authMiddleware = async (req, res, next) => {
     try {
+        console.log('authMiddleware');
+        console.log(req.headers);
         const authHeader = req.headers.authorization;
 
         if (!authHeader || authHeader.split(' ')[0] !== 'Bearer') {
