@@ -12,5 +12,6 @@ router.post('/likeTweet/:id/:userId', authMiddleware, controller.likeTweet);
 router.post('/retweet/:id/:userId', authMiddleware, controller.retweet);
 router.post('/uploadPhoto', authMiddleware, controller.uploadTweetPhoto);
 router.post('/upload', authMiddleware, controller.postTweet);
+router.delete('/delete/:id', authMiddleware, controller.deleteTweet);
 
 module.exports = router;

@@ -320,4 +320,26 @@ controller.retweet = async (req, res) => {
 	}
 };
 
+
+controller.deleteTweet = async (req, res) => {
+	try {
+		const tweet = await Tweet.findById(req.params.id);
+		if (!tweet) {
+			return res.status(STATUS.NOT_FOUND).json({
+				status: STATUS.NOT_FOUND,
+				message: 'Tweet not found',
+			});
+		}
+		await tweet.remove();
+		return res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Tweet deleted successfully',
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
+
 module.exports = controller;
