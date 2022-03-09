@@ -45,4 +45,29 @@ controller.addBookmark = async (req, res) => {
 	}
 };
 
+controller.getBookmarks = async (req, res) => {
+	try {
+		const { userId } = req.params;
+		const user = await User.findById(userId).populate('bookmarks')
+		if (!user) {
+			return res.status(STATUS.BAD_REQUEST).json({
+				status: STATUS.BAD_REQUEST,
+				message: 'User not found',
+			});
+		}
+
+		
+
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Bookmarks retrieved successfully',
+			bookmarks: user.bookmarks.map((tweet) => ({...tweet.toJSON(), user: user.toJSON()}))
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
+
 module.exports = controller;
