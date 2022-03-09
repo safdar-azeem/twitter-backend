@@ -32,5 +32,19 @@ controller.addTrend = async (req, res) => {
     }
 }
 
+controller.getTopTrends = async (req, res) => {
+	try {
+		const trends = await Trend.find({}).sort({ count: -1 }).limit(5);
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Trends fetched successfully',
+			trends,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
 
 module.exports = controller;
