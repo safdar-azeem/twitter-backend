@@ -5,11 +5,13 @@ const authRoute = require('./auth.route');
 const tweetRoute = require('./tweet.route');
 const commentRoute = require('./comment.route');
 const bookmarkRoute = require('./bookmark.route');
+const trendRoute = require('./trend.route');
 
 router.use('/auth', authRoute);
 router.use('/user', userRoute);
 router.use('/tweet', tweetRoute);
 router.use('/comment', commentRoute);
 router.use('/bookmar', bookmarkRoute);
+router.use('/trend', trendRoute);
 
 module.exports = router;
