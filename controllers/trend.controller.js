@@ -49,4 +49,39 @@ controller.getTopTrends = async (req, res) => {
 	}
 };
 
+
+controller.findTrend = async (req, res) => {
+    try {
+        const name = req.params.name;
+        const userId = req.params.userId;
+        const trend = await Trend.findOne({ 
+            name,
+            $or: [
+                {
+                    user: userId,
+                },
+                {
+                    is_Public: true,
+                },
+            ],
+         }).populate({
+            path: 'tweets',
+            populate: {
+                path: 'user',
+            },
+         })
+        if (trend) {
+            res.status(STATUS.SUCCESS).json({
+                status: STATUS.SUCCESS,
+                message: 'Trend fetched successfully',
+                trend,
+            });
+        }
+    } catch (err) {
+        res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+            message: err.message,
+        });
+    }  
+}
+
 module.exports = controller;
