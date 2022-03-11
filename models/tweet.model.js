@@ -55,14 +55,7 @@ const tweetSchema = new Schema({
 			type: Schema.Types.ObjectId,
 			ref: 'User',
 		},
-	],
-	trends: [
-		{
-			type: Schema.Types.ObjectId,
-			ref: 'Trend',
-		},
-	],
-			
+	],		
 });
 
 

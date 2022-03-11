@@ -5,10 +5,11 @@ const Trend = require('../models/trend.model');
 
 controller.addTrend = async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, tweetId } = req.body;
         const trend = await Trend.findOne({ name });
         if (trend) {
             trend.count += 1;
+            trend.tweets.push(tweetId);
             await trend.save();
             return res.status(STATUS.SUCCESS).json({
                 status: STATUS.SUCCESS,
@@ -17,6 +18,7 @@ controller.addTrend = async (req, res) => {
             });
         } else {
             const newTrend = new Trend({ name });
+            newTrend.tweets.push(tweetId);
             await newTrend.save();
             return res.status(STATUS.SUCCESS).json({
                 status: STATUS.SUCCESS,

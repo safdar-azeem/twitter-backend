@@ -14,6 +14,10 @@ const TrendSchema = new Schema({
         type: Number,
         default: 1,
     },
+    tweets: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Tweet',
+    }],
 });
 
 const Trend = mongoose.model('Trend', TrendSchema);
