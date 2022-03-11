@@ -56,14 +56,6 @@ controller.findTrend = async (req, res) => {
         const userId = req.params.userId;
         const trend = await Trend.findOne({ 
             name,
-            $or: [
-                {
-                    user: userId,
-                },
-                {
-                    is_Public: true,
-                },
-            ],
          }).populate({
             path: 'tweets',
             populate: {
@@ -71,10 +63,16 @@ controller.findTrend = async (req, res) => {
             },
          })
         if (trend) {
+            trend.tweets = trend.tweets.filter((tweet) => tweet.user._id.toString() === userId || tweet.is_Public);
             res.status(STATUS.SUCCESS).json({
                 status: STATUS.SUCCESS,
                 message: 'Trend fetched successfully',
                 trend,
+            });
+        } else {
+            res.status(STATUS.NOT_FOUND).json({
+                status: STATUS.NOT_FOUND,
+                message: 'Trend not found',
             });
         }
     } catch (err) {
