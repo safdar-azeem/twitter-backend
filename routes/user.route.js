@@ -10,6 +10,10 @@ router.put('/updateUser/:id', authMiddleware, controller.updateUser);
 router.put('/followUser/:userId/:followingId', authMiddleware, controller.followUser);
 router.get('/suggestedUsers/:userId/', controller.getSuggestedUsers,
 );
+router.get(
+	'/getUserFollowersOrFollowing/:userId/:type',
+	controller.getUserFollowersOrFollowing,
+);
 
 module.exports = router;
 
