@@ -8,6 +8,8 @@ router.get('/getUserById/:id', controller.getUserById);
 router.post('/uploadAvatarOrCover', authMiddleware, controller.uploadAvatarOrCover);
 router.put('/updateUser/:id', authMiddleware, controller.updateUser);
 router.put('/followUser/:userId/:followingId', authMiddleware, controller.followUser);
+router.get('/suggestedUsers/:userId/', controller.getSuggestedUsers,
+);
 
 module.exports = router;
 

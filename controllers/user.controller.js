@@ -119,4 +119,48 @@ controller.followUser = async (req, res) => {
 	}
 };
 
+controller.getSuggestedUsers = async (req, res) => {
+	try {
+		const user = await User.findById(req.params.userId);
+		if (!user) {
+			return res.status(STATUS.NOT_FOUND).json({
+				status: STATUS.NOT_FOUND,
+				message: 'User not found',
+			});
+		}
+		const pagination = {
+			page: req.query.page || 1,
+			limit: req.query.limit || 5,
+		};
+		const users = await User.find({
+			_id: {
+				$nin: [req.params.userId, ...user.following],
+			},
+		})
+			.skip((pagination.page - 1) * pagination.limit)
+			.limit(pagination.limit)
+			.sort({ date_Created: -1 })
+			.select('-password');
+
+		if (!users) {
+			return res.status(STATUS.NOT_FOUND).json({
+				status: STATUS.NOT_FOUND,
+				message: 'Users not found',
+			});
+		}
+
+		console.log(users);
+
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Suggested users found',
+			users,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
+
 module.exports = controller;
