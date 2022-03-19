@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const controller = {};
 const STATUS = require('../utils/status');
 const User = require('../models/user.model');
+const Notification = require('../models/notification.model');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 
@@ -92,12 +93,22 @@ controller.followUser = async (req, res) => {
 				message: 'User not found',
 			});
 		}
+
+		const notificationObj = {
+			sender: req.params.userId,
+			receiver: req.params.followingId,
+			type: 'follow',
+		};
+
 		if (user.following.includes(req.params.followingId)) {
 			user.following.pull(req.params.followingId);
 			userToFollow.followers.pull(req.params.userId);
+			await Notification.findOneAndDelete(notificationObj);
 		} else {
 			user.following.push(req.params.followingId);
 			userToFollow.followers.push(req.params.userId);
+			const notification = new Notification(notificationObj);
+			await notification.save();
 		}
 
 		await user.save({
@@ -178,15 +189,21 @@ controller.getUserFollowersOrFollowing = async (req, res) => {
 			page: req.query.page || 1,
 			limit: req.query.limit || 5,
 		};
-		const users = await User.find({
+
+		const query = {
 			_id: {
 				$in: type == 'following' ? user.following : user.followers,
 			},
-		})
+		};
+
+		const users = await User.find(query)
 			.skip((pagination.page - 1) * pagination.limit)
 			.limit(pagination.limit)
 			.sort({ updatedAt: -1 })
 			.select('-password');
+
+		// count the number of users
+		const count = await User.countDocuments(query);
 
 		if (!users) {
 			return res.status(STATUS.NOT_FOUND).json({
@@ -199,6 +216,7 @@ controller.getUserFollowersOrFollowing = async (req, res) => {
 			status: STATUS.SUCCESS,
 			message: 'Users found',
 			users,
+			count,
 		});
 	} catch (err) {
 		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
