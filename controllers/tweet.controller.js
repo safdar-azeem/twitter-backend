@@ -5,6 +5,7 @@ const Tweet = require('../models/tweet.model');
 const Comment = require('../models/comment.model');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
+const Notification = require('../models/notification.model');
 
 controller.uploadTweetPhoto = async (req, res) => {
 	try {
@@ -249,9 +250,18 @@ controller.likeTweet = async (req, res) => {
 				message: 'User not found',
 			});
 		}
+		
+		const notificationObj = {
+			sender: user._id,
+			receiver: tweet.user,
+			type: 'like',
+			tweet: tweet._id,
+		};
+		
 		if (tweet.likes.includes(user._id)) {
 			tweet.likes = tweet.likes.filter((like) => like.toString() !== user._id.toString());
 			await tweet.save();
+			await Notification.findOneAndDelete(notificationObj);
 			tweet.user = await User.findById(tweet.user);
 			return res.status(STATUS.SUCCESS).json({
 				status: STATUS.SUCCESS,
@@ -260,7 +270,9 @@ controller.likeTweet = async (req, res) => {
 			});
 		}
 		tweet.likes.push(user._id);
+		const notification = new Notification(notificationObj);
 		await tweet.save();
+		await notification.save();
 		tweet.user = await User.findById(tweet.user);
 		return res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
