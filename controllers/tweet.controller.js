@@ -303,11 +303,19 @@ controller.retweet = async (req, res) => {
 			});
 		}
 
+		const notificationObj = {
+			sender: user._id,
+			receiver: tweet.user,
+			type: 'retweet',
+			tweet: tweet._id,
+		};
+
 		if (tweet.retweetedBy.includes(user._id)) {
 			tweet.retweetedBy = tweet.retweetedBy.filter(
 				(retweetedBy) => retweetedBy.toString() !== user._id.toString(),
 			);
 			await tweet.save();
+			await Notification.findOneAndDelete(notificationObj);
 			tweet = await Tweet.findById(req.params.id).populate('user');
 			return res.status(STATUS.SUCCESS).json({
 				status: STATUS.SUCCESS,
@@ -318,6 +326,8 @@ controller.retweet = async (req, res) => {
 		}
 		tweet.retweetedBy.push(user._id);
 		await tweet.save();
+		const notification = new Notification(notificationObj);
+		await notification.save();
 		tweet = await Tweet.findById(req.params.id).populate('user');
 		return res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
