@@ -29,11 +29,15 @@ const notificationSchema = new Schema({
 		type: Date,
 		default: Date.now,
 	},
-	is_Read: {
+	isRead: {
+		type: Boolean,
+		default: false,
+	},
+	isSeen: {
 		type: Boolean,
 		default: false,
 	},
 });
 
-module.exports = mongoose.model('Notification', notificationSchema);
-	
+const Notification = mongoose.model('Notification', notificationSchema);
+module.exports = Notification;
