@@ -261,7 +261,7 @@ controller.likeTweet = async (req, res) => {
 		if (tweet.likes.includes(user._id)) {
 			tweet.likes = tweet.likes.filter((like) => like.toString() !== user._id.toString());
 			await tweet.save();
-			await Notification.findOneAndDelete(notificationObj);
+			user._id.toString() !== tweet.user.toString() && await Notification.findOneAndDelete(notificationObj);
 			tweet.user = await User.findById(tweet.user);
 			return res.status(STATUS.SUCCESS).json({
 				status: STATUS.SUCCESS,
@@ -270,9 +270,8 @@ controller.likeTweet = async (req, res) => {
 			});
 		}
 		tweet.likes.push(user._id);
-		const notification = new Notification(notificationObj);
 		await tweet.save();
-		await notification.save();
+		user._id.toString() !== tweet.user.toString() && await Notification.create(notificationObj);
 		tweet.user = await User.findById(tweet.user);
 		return res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
@@ -315,7 +314,7 @@ controller.retweet = async (req, res) => {
 				(retweetedBy) => retweetedBy.toString() !== user._id.toString(),
 			);
 			await tweet.save();
-			await Notification.findOneAndDelete(notificationObj);
+			user._id.toString() !== tweet.user.toString() && await Notification.findOneAndDelete(notificationObj);
 			tweet = await Tweet.findById(req.params.id).populate('user');
 			return res.status(STATUS.SUCCESS).json({
 				status: STATUS.SUCCESS,
@@ -326,8 +325,7 @@ controller.retweet = async (req, res) => {
 		}
 		tweet.retweetedBy.push(user._id);
 		await tweet.save();
-		const notification = new Notification(notificationObj);
-		await notification.save();
+		user._id.toString() !== tweet.user.toString() && await Notification.create(notificationObj);	
 		tweet = await Tweet.findById(req.params.id).populate('user');
 		return res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
