@@ -5,6 +5,8 @@ const Tweet = require('../models/tweet.model');
 const Comment = require('../models/comment.model');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
+const Notification = require('../models/notification.model');
+
 
 controller.getCommentsByTweetId = async (req, res) => {
 	try {
@@ -41,6 +43,15 @@ controller.postComment = async (req, res) => {
 		await comment.save();
 		tweet.comments.push(comment._id);
 		await tweet.save();
+		if (user._id.toString() !== tweet.user._id.toString()) {
+			const notification = new Notification({
+				sender: user._id,
+				receiver: tweet.user._id,
+				tweet: tweet._id,
+				type: 'comment',
+			});
+			await notification.save();
+		}
 		res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
 			message: 'Comment posted successfully',
