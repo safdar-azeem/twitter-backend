@@ -13,6 +13,8 @@ controller.signup = async (req, res) => {
 			});
 		}
 
+		const name = req.body.name.split(' ').map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' ');
+		req.body.name = name;
 		const user = await User.create(req.body);
 		res.status(STATUS.CREATED).json({
 			status: STATUS.CREATED,
