@@ -8,6 +8,7 @@ router.get('/getUserTweets/:id', controller.getUserTweets);
 router.get('/getUserMediaTweets/:id', controller.getUserMediaTweets);
 router.get('/getTweetsLikeByUser/:id', controller.getTweetsLikeByUser);
 router.get('/getTweetById/:id', controller.getTweetById);
+router.get('/exploreTweets/:userId', controller.exploreTweets);
 router.post('/likeTweet/:id/:userId', authMiddleware, controller.likeTweet);
 router.post('/retweet/:id/:userId', authMiddleware, controller.retweet);
 router.post('/uploadPhoto', authMiddleware, controller.uploadTweetPhoto);

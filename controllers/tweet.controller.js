@@ -340,7 +340,6 @@ controller.retweet = async (req, res) => {
 	}
 };
 
-
 controller.deleteTweet = async (req, res) => {
 	try {
 		const tweet = await Tweet.findById(req.params.id);
@@ -361,5 +360,60 @@ controller.deleteTweet = async (req, res) => {
 		});
 	}
 };
+
+controller.exploreTweets = async (req, res) => {
+	try {
+		// random tweets from all users except the logged in user
+		const userId = req.params.userId;
+		// random tweets
+		const tweets = await Tweet.aggregate([
+			{ $sample: { size: 10 } },
+			{ $match: {  
+				$and: [
+					{
+						is_Public: true,
+					},
+					{
+						user: {
+							$ne: userId,
+						},
+					}
+				]
+			}
+			},	
+			{
+				$lookup: {
+					from: 'users',
+					localField: 'user',
+					foreignField: '_id',
+					as: 'user',
+				},
+			},
+			{
+				$project: {
+					_id: 1,
+					user: {
+						_id: 1,
+						name: 1,
+						avatar: 1,
+					},
+					content: 1,
+					photo: 1,
+				}
+			}
+		]);
+		return res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Tweets fetched successfully',
+			tweets,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
+
+
 
 module.exports = controller;
