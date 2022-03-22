@@ -27,8 +27,8 @@ controller.addBookmark = async (req, res) => {
 			});
 		}
 
-		user.bookmarks.push(tweet._id);
-		tweet.bookmarks.push(user._id);
+		user.bookmarks.unshift(tweet._id);
+		tweet.bookmarks.unshift(user._id);
 		await Promise.all([user.save({
 			validateBeforeSave: false,
 		}), tweet.save()]);
@@ -48,7 +48,14 @@ controller.addBookmark = async (req, res) => {
 controller.getBookmarks = async (req, res) => {
 	try {
 		const { userId } = req.params;
-		const user = await User.findById(userId).populate('bookmarks')
+		const user = await User.findById(userId).populate('bookmarks').populate([
+			{
+				path: 'bookmarks',
+				populate: {
+					path: 'user',
+				}
+			},
+		]).sort({ createdAt: -1 });
 		if (!user) {
 			return res.status(STATUS.BAD_REQUEST).json({
 				status: STATUS.BAD_REQUEST,
@@ -61,7 +68,7 @@ controller.getBookmarks = async (req, res) => {
 		res.status(STATUS.SUCCESS).json({
 			status: STATUS.SUCCESS,
 			message: 'Bookmarks retrieved successfully',
-			bookmarks: user.bookmarks.map((tweet) => ({...tweet.toJSON(), user: user.toJSON()}))
+			bookmarks: user.bookmarks
 		});
 	} catch (err) {
 		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
