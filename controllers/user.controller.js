@@ -37,6 +37,30 @@ controller.getUserById = async (req, res) => {
 	}
 };
 
+controller.findUsersByName = async (req, res) => {
+	try {
+		const users = await User.find({
+			name: {
+				$regex: req.params.name,
+				$options: 'i',
+			},
+		}).select([
+			'name',
+			'avatar',
+			'bio'
+		])
+		res.status(STATUS.SUCCESS).json({
+			status: STATUS.SUCCESS,
+			message: 'Users found',
+			users,
+		});
+	} catch (err) {
+		res.status(STATUS.INTERNAL_SERVER_ERROR).json({
+			message: err.message,
+		});
+	}
+};
+
 controller.uploadAvatarOrCover = async (req, res) => {
 	try {
 		const { files } = req;
