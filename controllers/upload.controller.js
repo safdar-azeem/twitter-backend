@@ -1,7 +1,9 @@
-const controller = {}
+const fs = require('fs')
+const path = require('path')
 const STATUS = require('../utils/status')
 const cloudinary = require('cloudinary').v2
-const fs = require('fs')
+
+const controller = {}
 
 controller.uploadPhoto = async (req, res) => {
    try {
@@ -13,6 +15,7 @@ controller.uploadPhoto = async (req, res) => {
             message: 'Please provide an image',
          })
       }
+
       cloudinary.config({
          cloud_name: process.env.CLOUDINARY_NAME,
          api_key: process.env.CLOUDINARY_API_KEY,
@@ -20,10 +23,10 @@ controller.uploadPhoto = async (req, res) => {
       })
 
       const result = await cloudinary.uploader.upload(files.image.tempFilePath, {
-         folder: 'avatarsAndCover',
+         folder: 'twitter',
       })
 
-      fs.unlinkSync(files.image.tempFilePath)
+      fs.unlinkSync(path.resolve(process.cwd(), files.image.tempFilePath))
 
       return res.status(STATUS.SUCCESS).json({
          status: STATUS.SUCCESS,
