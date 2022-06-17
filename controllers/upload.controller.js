@@ -7,12 +7,12 @@ const controller = {}
 
 controller.uploadPhoto = async (req, res) => {
    try {
-      const { files } = req
+      const { base64Image } = req.body
 
-      if (!files || !files.image) {
+      if (!base64Image) {
          return res.status(STATUS.BAD_REQUEST).json({
             status: STATUS.BAD_REQUEST,
-            message: 'Please provide an image',
+            message: 'Please provide a base64 encoded image',
          })
       }
 
@@ -22,11 +22,11 @@ controller.uploadPhoto = async (req, res) => {
          api_secret: process.env.CLOUDINARY_API_SECRET,
       })
 
-      const result = await cloudinary.uploader.upload(files.image.tempFilePath, {
+      // Convert the file buffer to a base64 string
+      const result = await cloudinary.uploader.upload(base64Image, {
          folder: 'twitter',
+         resource_type: 'image', // Specify the type of resource being uploaded (image in this case)
       })
-
-      fs.unlinkSync(path.resolve(process.cwd(), files.image.tempFilePath))
 
       return res.status(STATUS.SUCCESS).json({
          status: STATUS.SUCCESS,
