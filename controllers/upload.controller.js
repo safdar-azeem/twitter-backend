@@ -38,7 +38,7 @@ controller.uploadPhoto = async (req, res) => {
       return res.status(STATUS.SUCCESS).json({
          status: STATUS.SUCCESS,
          message: 'uploaded successfully',
-         src: result.secure_url,
+         src: result.secure_url.replace('/upload/', '/upload/w_700,c_scale,q_auto,f_auto/'),
       })
    } catch (err) {
       return res.status(STATUS.INTERNAL_SERVER_ERROR).json({
