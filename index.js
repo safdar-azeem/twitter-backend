@@ -9,13 +9,9 @@ const connectDb = require('./config/connectDb.config')
 
 const app = express()
 
-app.use(
-   fileUpload({
-      useTempFiles: true,
-   })
-)
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(fileUpload())
+app.use(bodyParser.json({ limit: '50mb' }))
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }))
 app.use(cors({ origin: '*' }))
 
 app.get('/', (req, res) => {
