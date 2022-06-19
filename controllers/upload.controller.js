@@ -16,16 +16,23 @@ controller.uploadPhoto = async (req, res) => {
          })
       }
 
+      const isBase64Image = /^data:image\/([a-zA-Z]*);base64,([^\"]*)$/.test(base64Image)
+      if (!isBase64Image) {
+         return res.status(STATUS.BAD_REQUEST).json({
+            status: STATUS.BAD_REQUEST,
+            message: 'Provided data is not a valid base64-encoded image',
+         })
+      }
+
       cloudinary.config({
          cloud_name: process.env.CLOUDINARY_NAME,
          api_key: process.env.CLOUDINARY_API_KEY,
          api_secret: process.env.CLOUDINARY_API_SECRET,
       })
 
-      // Convert the file buffer to a base64 string
       const result = await cloudinary.uploader.upload(base64Image, {
          folder: 'twitter',
-         resource_type: 'image', // Specify the type of resource being uploaded (image in this case)
+         resource_type: 'image',
       })
 
       return res.status(STATUS.SUCCESS).json({
