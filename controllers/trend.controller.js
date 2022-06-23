@@ -1,6 +1,9 @@
 const controller = {}
 const STATUS = require('../utils/status')
 const Trend = require('../models/trend.model')
+const cache = require('../config/cache')
+
+const cacheTTL = 86400 // 1 day
 
 controller.addTrend = async (req, res) => {
    try {
@@ -34,9 +37,22 @@ controller.addTrend = async (req, res) => {
 
 controller.getTopTrends = async (req, res) => {
    try {
+      const cacheKey = 'getTopTrends'
+
+      const cachedResult = cache.get(cacheKey)
+      if (cachedResult) {
+         return res.status(STATUS.SUCCESS).json({
+            status: STATUS.SUCCESS,
+            message: 'Trends fetched successfully',
+            trends: cachedResult,
+         })
+      }
+
       const trends = await Trend.find({ count: { $gt: 0 } })
          .sort({ count: -1 })
          .limit(5)
+
+      cache.set(cacheKey, trends, cacheTTL)
 
       res.status(STATUS.SUCCESS).json({
          status: STATUS.SUCCESS,
