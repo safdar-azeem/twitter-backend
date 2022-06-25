@@ -1,9 +1,13 @@
 const controller = {}
+const cache = require('../config/cache')
 const STATUS = require('../utils/status')
 const User = require('../models/user.model')
 const Tweet = require('../models/tweet.model')
+const shuffleArray = require('../utils/shuffleArray')
 const Comment = require('../models/comment.model')
 const Notification = require('../models/notification.model')
+
+const cacheTTL = 3600 // 1 hour
 
 controller.postTweet = async (req, res) => {
    try {
@@ -299,6 +303,19 @@ controller.exploreTweets = async (req, res) => {
    try {
       // random tweets from all users except the logged in user
       const userId = req.params.userId
+
+      const cacheKey = `explore_tweets`
+
+      // Check if the result is already cached
+      const cachedResult = cache.get(cacheKey)
+      if (cachedResult) {
+         return res.status(STATUS.SUCCESS).json({
+            status: STATUS.SUCCESS,
+            message: 'Explore tweets fetched successfully',
+            tweets: shuffleArray(cachedResult),
+         })
+      }
+
       // random tweets
       const tweets = await Tweet.aggregate([
          { $sample: { size: 10 } },
@@ -337,6 +354,9 @@ controller.exploreTweets = async (req, res) => {
             },
          },
       ])
+
+      cache.set(cacheKey, tweets, cacheTTL)
+
       return res.status(STATUS.SUCCESS).json({
          status: STATUS.SUCCESS,
          message: 'Tweets fetched successfully',
