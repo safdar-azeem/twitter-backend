@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken')
 const STATUS = require('../utils/status')
 const User = require('../models/user.model')
 const Notification = require('../models/notification.model')
+const cache = require('../config/cache')
+
+const cacheTTL = 86400 // 1 day
 
 controller.getUsers = async (req, res) => {
    try {
@@ -124,10 +127,21 @@ controller.getSuggestedUsers = async (req, res) => {
    try {
       const user = req.user
 
+      const cacheKey = `suggested_users_${user._id}_${req.query.page || 1}_${req.query.limit || 5}`
+      const cachedResult = cache.get(cacheKey)
+      if (cachedResult) {
+         return res.status(STATUS.SUCCESS).json({
+            status: STATUS.SUCCESS,
+            message: 'Suggested users found',
+            users: cachedResult,
+         })
+      }
+
       const pagination = {
          page: req.query.page || 1,
          limit: req.query.limit || 5,
       }
+
       const users = await User.find({
          _id: {
             $nin: [user._id, ...user.following],
@@ -144,6 +158,8 @@ controller.getSuggestedUsers = async (req, res) => {
             message: 'Users not found',
          })
       }
+
+      cache.set(cacheKey, users, cacheTTL)
 
       res.status(STATUS.SUCCESS).json({
          status: STATUS.SUCCESS,
