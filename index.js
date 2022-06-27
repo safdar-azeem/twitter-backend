@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 app.use('/api/v1/', routes)
 
 const startServer = async () => {
-   const port = process.env.PORT || 5050
+   const port = process.env.PORT || 4005
    try {
       await connectDb()
       app.listen(port, () => {
