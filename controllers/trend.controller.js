@@ -3,7 +3,7 @@ const STATUS = require('../utils/status')
 const Trend = require('../models/trend.model')
 const cache = require('../config/cache')
 
-const cacheTTL = 86400 // 1 day
+const cacheTTL = 21600 // 6 hour
 
 controller.addTrend = async (req, res) => {
    try {
@@ -43,7 +43,7 @@ controller.getTopTrends = async (req, res) => {
       if (cachedResult) {
          return res.status(STATUS.SUCCESS).json({
             status: STATUS.SUCCESS,
-            message: 'Trends fetched successfully',
+            message: 'Trends fetched successfully from cache',
             trends: cachedResult,
          })
       }
