@@ -7,7 +7,7 @@ const shuffleArray = require('../utils/shuffleArray')
 const Comment = require('../models/comment.model')
 const Notification = require('../models/notification.model')
 
-const cacheTTL = 3600 // 1 hour
+const cacheTTL = 7200 // 2 hour
 
 controller.postTweet = async (req, res) => {
    try {
@@ -311,7 +311,7 @@ controller.exploreTweets = async (req, res) => {
       if (cachedResult) {
          return res.status(STATUS.SUCCESS).json({
             status: STATUS.SUCCESS,
-            message: 'Explore tweets fetched successfully',
+            message: 'Explore tweets fetched successfully from cache',
             tweets: shuffleArray(cachedResult),
          })
       }
