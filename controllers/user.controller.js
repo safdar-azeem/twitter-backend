@@ -5,7 +5,7 @@ const User = require('../models/user.model')
 const Notification = require('../models/notification.model')
 const cache = require('../config/cache')
 
-const cacheTTL = 86400 // 1 day
+const cacheTTL = 21600 // 1 day
 
 controller.getUsers = async (req, res) => {
    try {
@@ -80,6 +80,11 @@ controller.followUser = async (req, res) => {
       const user = req.user
       const userToFollow = await User.findById(req.params.followingId)
 
+      const cacheKey = `suggested_users_${user._id}}`
+      const cache2Key = `suggested_users_${req.params.followingId}}`
+      cache.del(cacheKey)
+      cache.del(cache2Key)
+
       if (!userToFollow) {
          return res.status(STATUS.NOT_FOUND).json({
             status: STATUS.NOT_FOUND,
@@ -127,12 +132,12 @@ controller.getSuggestedUsers = async (req, res) => {
    try {
       const user = req.user
 
-      const cacheKey = `suggested_users_${user._id}_${req.query.page || 1}_${req.query.limit || 5}`
+      const cacheKey = `suggested_users_${user._id}}`
       const cachedResult = cache.get(cacheKey)
       if (cachedResult) {
          return res.status(STATUS.SUCCESS).json({
             status: STATUS.SUCCESS,
-            message: 'Suggested users found',
+            message: 'Suggested users found from cache',
             users: cachedResult,
          })
       }
